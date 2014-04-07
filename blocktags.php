@@ -146,7 +146,7 @@ class BlockTags extends Module
 						'label' => $this->l('Displayed tags'),
 						'name' => 'BLOCKTAGS_NBR',
 						'class' => 'fixed-width-xs',
-						'desc' => $this->l('Set the number of tags you would like displayed in this block.')
+						'desc' => $this->l('Set the number of tags you would like to see displayed in this block.')
 					),
 				),
 				'submit' => array(
