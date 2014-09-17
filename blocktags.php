@@ -27,8 +27,6 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-define('BLOCKTAGS_MAX_LEVEL', 3);
-
 class BlockTags extends Module
 {
 	function __construct()
@@ -68,22 +66,35 @@ class BlockTags extends Module
 	}
 
 	public function getContent()
-	{
-		$output = '';
-		if (Tools::isSubmit('submitBlockTags'))
-		{
-			if (!($tagsNbr = Tools::getValue('BLOCKTAGS_NBR')) || empty($tagsNbr))
-				$output .= $this->displayError($this->l('Please complete the "Displayed tags" field.'));
-			elseif ((int)($tagsNbr) == 0)
-				$output .= $this->displayError($this->l('Invalid number.'));
-			else
-			{
-				Configuration::updateValue('BLOCKTAGS_NBR', (int)$tagsNbr);
-				$output .= $this->displayConfirmation($this->l('Settings updated'));
-			}
-		}
-		return $output.$this->renderForm();
-	}
+        {
+                $output = '';
+                $errors = array();
+                if (Tools::isSubmit('submitBlockTags'))
+                {
+                        $tagsNbr = Tools::getValue('BLOCKTAGS_NBR');
+                        if (0==strlen($tagsNbr))
+                                $errors[] = $this->l('Please complete the "Displayed tags" field.');
+                        elseif (!Validate::isInt($tagsNbr) || (int)($tagsNbr) <= 0)
+                                $errors[] = $this->l('Invalid number.');
+
+                        $tagsLevels = Tools::getValue('BLOCKTAGS_MAX_LEVEL');
+                        if (0==strlen($tagsLevels))
+                                $errors[] = $this->l('Please complete the "Tags levels" field.');
+                        elseif (!Validate::isInt($tagsLevels) || (int)($tagsLevels) <= 0)
+                                $errors[] = $this->l('Invalid value for "Tags levels". Choose a positive integer number.');
+
+                        if (count($errors))
+                                $output = $this->displayError(implode('<br />', $errors));
+                        else
+                        {
+                                Configuration::updateValue('BLOCKTAGS_NBR', (int)$tagsNbr);
+                                Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', (int)$tagsLevels);
+
+                                $output = $this->displayConfirmation($this->l('Settings updated'));
+                        }
+                }
+                return $output.$this->renderForm();
+        }
 
 	/**
 	* Returns module content for left column
@@ -110,7 +121,7 @@ class BlockTags extends Module
 			$coef = $max;
 		else
 		{
-			$coef = (BLOCKTAGS_MAX_LEVEL - 1) / ($max - $min);
+			$coef = (Configuration::get('BLOCKTAGS_MAX_LEVEL') - 1) / ($max - $min);
 		}
 		
 		if (!sizeof($tags))
@@ -146,8 +157,15 @@ class BlockTags extends Module
 						'label' => $this->l('Displayed tags'),
 						'name' => 'BLOCKTAGS_NBR',
 						'class' => 'fixed-width-xs',
-						'desc' => $this->l('Set the number of tags you would like to see displayed in this block.')
-					),
+						'desc' => $this->l('Set the number of tags you would like to see displayed in this block. (default: 10)')
+                                        ),
+                                        array(
+                                                'type' => 'text',
+                                                'label' => $this->l('Tags levels'),
+                                                'name' => 'BLOCKTAGS_MAX_LEVEL',
+                                                'class' => 'fixed-width-xs',
+                                                'desc' => $this->l('Set the number of different tags levels you would like to use. (default: 3)')
+                                        ),
 				),
 				'submit' => array(
 					'title' => $this->l('Save'),
@@ -178,6 +196,7 @@ class BlockTags extends Module
 	{		
 		return array(
 			'BLOCKTAGS_NBR' => Tools::getValue('BLOCKTAGS_NBR', Configuration::get('BLOCKTAGS_NBR')),
+			'BLOCKTAGS_MAX_LEVEL' => Tools::getValue('BLOBLOCKTAGS_MAX_LEVEL', Configuration::get('BLOCKTAGS_MAX_LEVEL')),
 		);
 	}
 
