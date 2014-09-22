@@ -47,7 +47,7 @@ class BlockTags extends Module
 
 	function install()
 	{
-		$success = (parent::install() && $this->registerHook('header') && Configuration::updateValue('BLOCKTAGS_NBR', 10));
+		$success = (parent::install() && $this->registerHook('header') && Configuration::updateValue('BLOCKTAGS_NBR', 10) && Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', 3));
 
 		if ($success)
 		{
@@ -72,13 +72,13 @@ class BlockTags extends Module
                 if (Tools::isSubmit('submitBlockTags'))
                 {
                         $tagsNbr = Tools::getValue('BLOCKTAGS_NBR');
-                        if (0==strlen($tagsNbr))
+                        if (!strlen($tagsNbr))
                                 $errors[] = $this->l('Please complete the "Displayed tags" field.');
                         elseif (!Validate::isInt($tagsNbr) || (int)($tagsNbr) <= 0)
                                 $errors[] = $this->l('Invalid number.');
 
                         $tagsLevels = Tools::getValue('BLOCKTAGS_MAX_LEVEL');
-                        if (0==strlen($tagsLevels))
+                        if (!strlen($tagsLevels))
                                 $errors[] = $this->l('Please complete the "Tags levels" field.');
                         elseif (!Validate::isInt($tagsLevels) || (int)($tagsLevels) <= 0)
                                 $errors[] = $this->l('Invalid value for "Tags levels". Choose a positive integer number.');
@@ -195,8 +195,8 @@ class BlockTags extends Module
 	public function getConfigFieldsValues()
 	{		
 		return array(
-			'BLOCKTAGS_NBR' => Tools::getValue('BLOCKTAGS_NBR', Configuration::get('BLOCKTAGS_NBR')),
-			'BLOCKTAGS_MAX_LEVEL' => Tools::getValue('BLOBLOCKTAGS_MAX_LEVEL', Configuration::get('BLOCKTAGS_MAX_LEVEL')),
+			'BLOCKTAGS_NBR' => Tools::getValue('BLOCKTAGS_NBR', (int)Configuration::get('BLOCKTAGS_NBR')),
+			'BLOCKTAGS_MAX_LEVEL' => Tools::getValue('BLOCKTAGS_MAX_LEVEL', (int)Configuration::get('BLOCKTAGS_MAX_LEVEL')),
 		);
 	}
 
