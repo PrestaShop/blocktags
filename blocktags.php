@@ -181,7 +181,6 @@ class BlockTags extends Module
                                         ),
                                         array(
                                         	'type' => 'switch',
-                                        	'is_bool' => true, //retro-compat
                                         	'label' => $this->l('Randomize displayed tags'),
                                         	'name' => 'BLOCKTAGS_RANDOMIZE',
                                         	'class' => 'fixed-width-xs',
