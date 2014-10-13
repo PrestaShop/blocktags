@@ -47,7 +47,11 @@ class BlockTags extends Module
 
 	function install()
 	{
-		$success = (parent::install() && $this->registerHook('header') && Configuration::updateValue('BLOCKTAGS_NBR', 10) && Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', 3));
+		$success = (parent::install() && $this->registerHook('header')
+			&& Configuration::updateValue('BLOCKTAGS_NBR', 10)
+			&& Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', 3)
+			&& Configuration::updateValue('BLOCKTAGS_RANDOMIZE', false)
+		);
 
 		if ($success)
 		{
@@ -82,6 +86,12 @@ class BlockTags extends Module
                                 $errors[] = $this->l('Please complete the "Tags levels" field.');
                         elseif (!Validate::isInt($tagsLevels) || (int)($tagsLevels) <= 0)
                                 $errors[] = $this->l('Invalid value for "Tags levels". Choose a positive integer number.');
+                        
+                        $randomize = Tools::getValue('BLOCKTAGS_RANDOMIZE');
+                        if (!strlen($randomize))
+                        	$errors[] = $this->l('Please complete the "Randomize" field.');
+                        elseif (!Validate::isBool($randomize))
+                        	$errors[] = $this->l('Invalid value for "Randomize". It has to be a boolean.');
 
                         if (count($errors))
                                 $output = $this->displayError(implode('<br />', $errors));
@@ -89,6 +99,7 @@ class BlockTags extends Module
                         {
                                 Configuration::updateValue('BLOCKTAGS_NBR', (int)$tagsNbr);
                                 Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', (int)$tagsLevels);
+                                Configuration::updateValue('BLOCKTAGS_RANDOMIZE', (bool)$randomize);
 
                                 $output = $this->displayConfirmation($this->l('Settings updated'));
                         }
@@ -126,6 +137,8 @@ class BlockTags extends Module
 		
 		if (!sizeof($tags))
 			return false;
+		if (Configuration::get('BLOCKTAGS_RANDOMIZE'))
+			shuffle($tags);
 		foreach ($tags AS &$tag)
 			$tag['class'] = 'tag_level'.(int)(($tag['times'] - $min) * $coef + 1);
 		$this->smarty->assign('tags', $tags);
@@ -166,6 +179,25 @@ class BlockTags extends Module
                                                 'class' => 'fixed-width-xs',
                                                 'desc' => $this->l('Set the number of different tags levels you would like to use. (default: 3)')
                                         ),
+                                        array(
+                                        	'type' => 'switch',
+                                        	'label' => $this->l('Randomize displayed tags'),
+                                        	'name' => 'BLOCKTAGS_RANDOMIZE',
+                                        	'class' => 'fixed-width-xs',
+                                        	'desc' => $this->l('Activate tags dispaly in randomic order. (default: no)'),
+                                        	'values' => array(
+                                        		array(
+                                        			'id' => 'active_on',
+                                        			'value' => 1,
+                                        			'label' => $this->l('Enabled')
+                                        			),
+                                        		array(
+                                        			'id' => 'active_off',
+                                        			'value' => 0,
+                                        			'label' => $this->l('Disabled')
+                                        		)
+                                        	)
+                                        )
 				),
 				'submit' => array(
 					'title' => $this->l('Save'),
@@ -197,6 +229,7 @@ class BlockTags extends Module
 		return array(
 			'BLOCKTAGS_NBR' => Tools::getValue('BLOCKTAGS_NBR', (int)Configuration::get('BLOCKTAGS_NBR')),
 			'BLOCKTAGS_MAX_LEVEL' => Tools::getValue('BLOCKTAGS_MAX_LEVEL', (int)Configuration::get('BLOCKTAGS_MAX_LEVEL')),
+			'BLOCKTAGS_RANDOMIZE' => Tools::getValue('BLOCKTAGS_RANDOMIZE', (bool)Configuration::get('BLOCKTAGS_RANDOMIZE')),
 		);
 	}
 
