@@ -7,4 +7,3 @@ function upgrade_module_1_2_2($object)
 {
 	return Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', 3);
 }
-
