@@ -181,10 +181,10 @@ class BlockTags extends Module
                                         ),
                                         array(
                                         	'type' => 'switch',
-                                        	'label' => $this->l('Randomize displayed tags'),
+                                        	'label' => $this->l('Random display'),
                                         	'name' => 'BLOCKTAGS_RANDOMIZE',
                                         	'class' => 'fixed-width-xs',
-                                        	'desc' => $this->l('Activate tags dispaly in randomic order. (default: no)'),
+                                        	'desc' => $this->l('If enabled, displays tags randomly. By default, random display is disabled and the most used tags are displayed first.'),
                                         	'values' => array(
                                         		array(
                                         			'id' => 'active_on',
