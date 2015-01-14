@@ -38,7 +38,7 @@ class BlockTags extends Module
 		$this->need_instance = 0;
 
 		$this->bootstrap = true;
-		parent::__construct();	
+		parent::__construct();
 
 		$this->displayName = $this->l('Tags block');
 		$this->description = $this->l('Adds a block containing your product tags.');
@@ -53,19 +53,6 @@ class BlockTags extends Module
 			&& Configuration::updateValue('BLOCKTAGS_RANDOMIZE', false)
 		);
 
-		if ($success)
-		{
-			// Hook the module either on the left or right column
-			$theme = new Theme(Context::getContext()->shop->id_theme);
-			if ((!$theme->default_left_column || !$this->registerHook('leftColumn'))
-				&& (!$theme->default_right_column || !$this->registerHook('rightColumn')))
-			{
-				// If there are no colums implemented by the template, throw an error and uninstall the module
-				$this->_errors[] = $this->l('This module need to be hooked in a column and your theme does not implement one');
-				parent::uninstall();
-				return false;
-			}
-		}
 		return $success;
 	}
 
@@ -86,7 +73,7 @@ class BlockTags extends Module
                                 $errors[] = $this->l('Please complete the "Tags levels" field.');
                         elseif (!Validate::isInt($tagsLevels) || (int)($tagsLevels) <= 0)
                                 $errors[] = $this->l('Invalid value for "Tags levels". Choose a positive integer number.');
-                        
+
                         $randomize = Tools::getValue('BLOCKTAGS_RANDOMIZE');
                         if (!strlen($randomize))
                         	$errors[] = $this->l('Please complete the "Randomize" field.');
@@ -117,7 +104,7 @@ class BlockTags extends Module
 	function hookLeftColumn($params)
 	{
 		$tags = Tag::getMainTags((int)($params['cookie']->id_lang), (int)(Configuration::get('BLOCKTAGS_NBR')));
-		
+
 		$max = -1;
 		$min = -1;
 		foreach ($tags as $tag)
@@ -127,14 +114,14 @@ class BlockTags extends Module
 			if ($tag['times'] < $min || $min == -1)
 				$min = $tag['times'];
 		}
-		
+
 		if ($min == $max)
 			$coef = $max;
 		else
 		{
 			$coef = (Configuration::get('BLOCKTAGS_MAX_LEVEL') - 1) / ($max - $min);
 		}
-		
+
 		if (!sizeof($tags))
 			return false;
 		if (Configuration::get('BLOCKTAGS_RANDOMIZE'))
@@ -155,7 +142,7 @@ class BlockTags extends Module
 	{
 		$this->context->controller->addCSS(($this->_path).'blocktags.css', 'all');
 	}
-	
+
 	public function renderForm()
 	{
 		$fields_form = array(
@@ -204,7 +191,7 @@ class BlockTags extends Module
 				)
 			),
 		);
-			
+
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
 		$helper->table =  $this->table;
@@ -223,9 +210,9 @@ class BlockTags extends Module
 
 		return $helper->generateForm(array($fields_form));
 	}
-	
+
 	public function getConfigFieldsValues()
-	{		
+	{
 		return array(
 			'BLOCKTAGS_NBR' => Tools::getValue('BLOCKTAGS_NBR', (int)Configuration::get('BLOCKTAGS_NBR')),
 			'BLOCKTAGS_MAX_LEVEL' => Tools::getValue('BLOCKTAGS_MAX_LEVEL', (int)Configuration::get('BLOCKTAGS_MAX_LEVEL')),
