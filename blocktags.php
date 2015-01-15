@@ -47,7 +47,7 @@ class BlockTags extends Module
 
 	function install()
 	{
-		$success = (parent::install() && $this->registerHook('header')
+		$success = (parent::install() && $this->registerHook('header') && $this->registerHook('leftColumn')
 			&& Configuration::updateValue('BLOCKTAGS_NBR', 10)
 			&& Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', 3)
 			&& Configuration::updateValue('BLOCKTAGS_RANDOMIZE', false)
