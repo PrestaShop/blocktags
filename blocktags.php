@@ -47,13 +47,47 @@ class BlockTags extends Module
 
 	function install()
 	{
-		$success = (parent::install() && $this->registerHook('header') && $this->registerHook('leftColumn')
+		$success = (parent::install()
+			&& $this->registerHook('header')
+			&& $this->registerHook('leftColumn')
+			&& $this->registerHook('addproduct')
+			&& $this->registerHook('updateproduct')
+			&& $this->registerHook('deleteproduct')
 			&& Configuration::updateValue('BLOCKTAGS_NBR', 10)
 			&& Configuration::updateValue('BLOCKTAGS_MAX_LEVEL', 3)
 			&& Configuration::updateValue('BLOCKTAGS_RANDOMIZE', false)
 		);
 
+		$this->_clearCache('*');
+
 		return $success;
+	}
+
+	public function uninstall()
+	{
+		$this->_clearCache('*');
+
+		return parent::uninstall();
+	}
+
+	public function hookAddProduct($params)
+	{
+		$this->_clearCache('*');
+	}
+
+	public function hookUpdateProduct($params)
+	{
+		$this->_clearCache('*');
+	}
+
+	public function hookDeleteProduct($params)
+	{
+		$this->_clearCache('*');
+	}
+
+	public function _clearCache($template, $cache_id = NULL, $compile_id = NULL)
+	{
+		parent::_clearCache('blocktags.tpl');
 	}
 
 	public function getContent()
@@ -103,34 +137,34 @@ class BlockTags extends Module
 	*/
 	function hookLeftColumn($params)
 	{
-		$tags = Tag::getMainTags((int)($params['cookie']->id_lang), (int)(Configuration::get('BLOCKTAGS_NBR')));
-
-		$max = -1;
-		$min = -1;
-		foreach ($tags as $tag)
+		if (!$this->isCached('blocktags.tpl', $this->getCacheId('blocktags')))
 		{
-			if ($tag['times'] > $max)
-				$max = $tag['times'];
-			if ($tag['times'] < $min || $min == -1)
-				$min = $tag['times'];
+			$tags = Tag::getMainTags((int)($params['cookie']->id_lang), (int)(Configuration::get('BLOCKTAGS_NBR')));
+
+			$max = -1;
+			$min = -1;
+			foreach ($tags as $tag)
+			{
+				if ($tag['times'] > $max)
+					$max = $tag['times'];
+				if ($tag['times'] < $min || $min == -1)
+					$min = $tag['times'];
+			}
+
+			if ($min == $max)
+				$coef = $max;
+			else
+				$coef = (Configuration::get('BLOCKTAGS_MAX_LEVEL') - 1) / ($max - $min);
+
+			if (!count($tags))
+				return false;
+			if (Configuration::get('BLOCKTAGS_RANDOMIZE'))
+				shuffle($tags);
+			foreach ($tags as &$tag)
+				$tag['class'] = 'tag_level'.(int)(($tag['times'] - $min) * $coef + 1);
+			$this->smarty->assign('tags', $tags);
 		}
-
-		if ($min == $max)
-			$coef = $max;
-		else
-		{
-			$coef = (Configuration::get('BLOCKTAGS_MAX_LEVEL') - 1) / ($max - $min);
-		}
-
-		if (!sizeof($tags))
-			return false;
-		if (Configuration::get('BLOCKTAGS_RANDOMIZE'))
-			shuffle($tags);
-		foreach ($tags AS &$tag)
-			$tag['class'] = 'tag_level'.(int)(($tag['times'] - $min) * $coef + 1);
-		$this->smarty->assign('tags', $tags);
-
-		return $this->display(__FILE__, 'blocktags.tpl');
+		return $this->display(__FILE__, 'blocktags.tpl', $this->getCacheId('blocktags'));
 	}
 
 	function hookRightColumn($params)
@@ -194,7 +228,7 @@ class BlockTags extends Module
 
 		$helper = new HelperForm();
 		$helper->show_toolbar = false;
-		$helper->table =  $this->table;
+		$helper->table = $this->table;
 		$lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
 		$helper->default_form_language = $lang->id;
 		$helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
