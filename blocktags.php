@@ -33,7 +33,7 @@ class BlockTags extends Module
 	{
 		$this->name = 'blocktags';
 		$this->tab = 'front_office_features';
-		$this->version = '1.2.4';
+		$this->version = '1.2.5';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
