@@ -104,9 +104,9 @@ class BlockTags extends Module
 
                         $tagsLevels = Tools::getValue('BLOCKTAGS_MAX_LEVEL');
                         if (!strlen($tagsLevels))
-                                $errors[] = $this->l('Please complete the "Tags levels" field.');
+                                $errors[] = $this->l('Please complete the "Tag levels" field.');
                         elseif (!Validate::isInt($tagsLevels) || (int)($tagsLevels) <= 0)
-                                $errors[] = $this->l('Invalid value for "Tags levels". Choose a positive integer number.');
+                                $errors[] = $this->l('Invalid value for "Tag levels". Choose a positive integer number.');
 
                         $randomize = Tools::getValue('BLOCKTAGS_RANDOMIZE');
                         if (!strlen($randomize))
@@ -195,10 +195,10 @@ class BlockTags extends Module
                                         ),
                                         array(
                                                 'type' => 'text',
-                                                'label' => $this->l('Tags levels'),
+                                                'label' => $this->l('Tag levels'),
                                                 'name' => 'BLOCKTAGS_MAX_LEVEL',
                                                 'class' => 'fixed-width-xs',
-                                                'desc' => $this->l('Set the number of different tags levels you would like to use. (default: 3)')
+                                                'desc' => $this->l('Set the number of different tag levels you would like to use. (default: 3)')
                                         ),
                                         array(
                                         	'type' => 'switch',
