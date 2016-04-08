@@ -42,7 +42,7 @@ class BlockTags extends Module
 
 		$this->displayName = $this->l('Tags block');
 		$this->description = $this->l('Adds a block containing your product tags.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.99.99');
 	}
 
 	function install()
